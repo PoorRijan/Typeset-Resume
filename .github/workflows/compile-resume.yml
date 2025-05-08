@@ -1,0 +1,40 @@
+name: Compile Resume PDF
+
+# Controls when the workflow will run
+on:
+  push:
+    branches: [ main ] # Or "master" if that's your main branch name
+  pull_request:
+    branches: [ main ] # Also compile on PRs to main to check before merging
+  workflow_dispatch: # Allows manual triggering from the Actions tab
+
+jobs:
+  compile:
+    name: Compile Typst to PDF
+    runs-on: ubuntu-latest # Use a Linux runner
+
+    steps:
+      # 1. Check out your repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Typst
+      # We'll use a community action for this.
+      # You can also manually download and install Typst if you prefer.
+      - name: Setup Typst
+        uses: typst-community/setup-typst@v3 # Or check for the latest version
+        # with:
+        #   typst-version: '0.10.0' # Optional: specify a Typst version
+
+      # 3. Compile the resume
+      # Assumes resume.typ and information.yaml are in the root
+      - name: Compile resume.typ
+        run: typst compile resume.typ resume.pdf
+
+      # 4. Upload the PDF as an artifact
+      # This makes the PDF downloadable from the workflow run page
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: resume-pdf # Name of the artifact bundle
+          path: resume.pdf  # Path to the file to upload
